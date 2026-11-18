@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\MicrosoftController;
 use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
@@ -23,6 +24,8 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
     Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
+
+    Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar');
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
