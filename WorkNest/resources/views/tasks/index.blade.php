@@ -56,8 +56,7 @@
                     @endphp
 
                     <li class="-mt-0.5 flex items-center gap-3 first:mt-0">
-                        {{-- The circle (we make it clickable in Step 9) --}}
-                        <span class="h-6 w-6 shrink-0 rounded-full border-2 border-bark {{ $task->is_done ? 'bg-bark' : '' }}"></span>
+                        @include('tasks._toggle', ['task' => $task])
 
                         <div class="grid flex-1 grid-cols-[1fr_6rem_6rem] divide-x-2 divide-bark border-2 border-bark sm:grid-cols-[1fr_10rem_9rem]">
                             <div class="min-w-0 px-4 py-3">

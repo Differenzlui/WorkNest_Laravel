@@ -25,6 +25,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
     Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
 
+    Route::get('/tasks/date/{date}', [TaskController::class, 'byDate'])
+        ->where('date', '[0-9]{4}-[0-9]{2}-[0-9]{2}')
+        ->name('tasks.by-date');
+
+    Route::patch('/tasks/{task}/toggle', [TaskController::class, 'toggle'])->name('tasks.toggle');
+    Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
+    Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
+
     Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar');
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
