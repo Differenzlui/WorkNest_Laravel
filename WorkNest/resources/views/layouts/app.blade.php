@@ -25,6 +25,8 @@
                    class="hover:underline {{ request()->is('tasks*') ? 'underline' : '' }}">Home</a>
                 <a href="{{ route('calendar') }}"
                    class="hover:underline {{ request()->is('calendar*') ? 'underline' : '' }}">Calendar</a>
+                <a href="{{ route('groups.index') }}"
+                   class="hover:underline {{ request()->is('groups*') ? 'underline' : '' }}">Groups</a>
 
                 {{-- Profile dropdown --}}
                 <div class="relative">

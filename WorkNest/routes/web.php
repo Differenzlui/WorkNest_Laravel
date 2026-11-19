@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\GroupController;
+use App\Http\Controllers\GroupMemberController;
 use App\Http\Controllers\MicrosoftController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\TaskController;
@@ -44,6 +46,19 @@ Route::middleware('auth')->group(function () {
     Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
 
     Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar');
+
+    // Groups
+    Route::get('/groups', [GroupController::class, 'index'])->name('groups.index');
+    Route::post('/groups', [GroupController::class, 'store'])->name('groups.store');
+    Route::get('/groups/{group}', [GroupController::class, 'show'])->name('groups.show');
+    Route::delete('/groups/{group}', [GroupController::class, 'destroy'])->name('groups.destroy');
+
+    // Group members
+    Route::post('/groups/{group}/members', [GroupMemberController::class, 'store'])
+        ->middleware('throttle:20,1')
+        ->name('groups.members.store');
+    Route::delete('/groups/{group}/members/{user}', [GroupMemberController::class, 'destroy'])->name('groups.members.destroy');
+    Route::delete('/groups/{group}/leave', [GroupMemberController::class, 'leave'])->name('groups.leave');
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
