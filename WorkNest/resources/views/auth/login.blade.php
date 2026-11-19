@@ -4,6 +4,13 @@
 
 @section('content')
     <div class="rounded-3xl bg-cream p-8">
+
+        @if (session('status'))
+            <div class="mb-4 rounded-2xl bg-leaf px-4 py-3 text-sm font-bold">
+                {{ session('status') }}
+            </div>
+        @endif
+
         <form method="POST" action="{{ route('login') }}" class="space-y-4">
             @csrf
 
@@ -16,11 +23,14 @@
             </div>
 
             <div>
-                <input type="password" name="password" placeholder="Password" required
-                       class="w-full rounded-2xl bg-white px-5 py-4 placeholder-gray-400 outline-none focus:ring-2 focus:ring-leaf">
+                <x-password-input name="password" placeholder="Password" autocomplete="current-password" />
                 @error('password')
                     <p class="mt-1 px-2 text-sm text-red-700">{{ $message }}</p>
                 @enderror
+
+                <p class="mt-2 px-2 text-right text-sm">
+                    <a href="{{ route('password.request') }}" class="underline">Forgot password?</a>
+                </p>
             </div>
 
             <button type="submit"
@@ -29,7 +39,7 @@
             </button>
         </form>
 
-                <div class="my-4 flex items-center gap-3 text-sm opacity-60">
+        <div class="my-4 flex items-center gap-3 text-sm opacity-60">
             <div class="h-px flex-1 bg-bark"></div>
             <span>or</span>
             <div class="h-px flex-1 bg-bark"></div>

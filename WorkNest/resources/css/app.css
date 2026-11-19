@@ -17,3 +17,8 @@
 body {
     font-family: 'Nunito', ui-sans-serif, system-ui, sans-serif;
 }
+/* Hide Edge's built-in password reveal button (we have our own) */
+input::-ms-reveal,
+input::-ms-clear {
+    display: none;
+}

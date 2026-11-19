@@ -26,11 +26,15 @@
             </div>
 
             <div>
-                <input type="password" name="password" placeholder="Password (at least 8 characters)" required
-                       class="w-full rounded-2xl bg-white px-5 py-4 placeholder-gray-400 outline-none focus:ring-2 focus:ring-leaf">
+                <x-password-input name="password" placeholder="Password (at least 8 characters)" autocomplete="new-password" />
                 @error('password')
                     <p class="mt-1 px-2 text-sm text-red-700">{{ $message }}</p>
                 @enderror
+            </div>
+
+            <div>
+                <x-password-input name="password_confirmation" placeholder="Confirm password" autocomplete="new-password" />
+                <p id="match-hint" class="mt-1 px-2 text-sm"></p>
             </div>
 
             <button type="submit"
@@ -43,4 +47,25 @@
             I already have an account
         </a>
     </div>
+
+    <script>
+        // Live hint under "Confirm password" (the real check happens on the server)
+        const passwordInput = document.getElementById('password');
+        const confirmInput = document.getElementById('password_confirmation');
+        const matchHint = document.getElementById('match-hint');
+
+        function checkMatch() {
+            if (confirmInput.value === '') {
+                matchHint.textContent = '';
+                return;
+            }
+
+            const ok = passwordInput.value === confirmInput.value;
+            matchHint.textContent = ok ? 'Passwords match' : 'Passwords do not match yet';
+            matchHint.className = 'mt-1 px-2 text-sm ' + (ok ? 'text-green-700' : 'text-red-700');
+        }
+
+        passwordInput.addEventListener('input', checkMatch);
+        confirmInput.addEventListener('input', checkMatch);
+    </script>
 @endsection

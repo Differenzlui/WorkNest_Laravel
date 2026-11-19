@@ -21,5 +21,21 @@
         </div>
     </div>
 
+        <script>
+        // One listener handles every show/hide password button on the page
+        document.addEventListener('click', (event) => {
+            const button = event.target.closest('[data-toggle-password]');
+            if (!button) return;
+
+            const input = button.parentElement.querySelector('input');
+            const show = input.type === 'password';
+
+            input.type = show ? 'text' : 'password';
+            button.setAttribute('aria-pressed', show ? 'true' : 'false');
+            button.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+            button.querySelector('[data-eye]').classList.toggle('hidden', show);
+            button.querySelector('[data-eye-off]').classList.toggle('hidden', !show);
+        });
+    </script>
 </body>
 </html>
