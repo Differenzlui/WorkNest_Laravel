@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Group extends Model
 {
@@ -28,6 +29,12 @@ class Group extends Model
     public function tasks(): HasMany
     {
         return $this->hasMany(GroupTask::class);
+    }
+
+    // Progress reports of all the tasks in this group
+    public function taskUpdates(): HasManyThrough
+    {
+        return $this->hasManyThrough(GroupTaskUpdate::class, GroupTask::class, 'group_id', 'group_task_id');
     }
 
     public function isOwnedBy(User $user): bool

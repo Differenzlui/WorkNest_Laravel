@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\GroupMemberController;
+use App\Http\Controllers\GroupTaskController;
 use App\Http\Controllers\MicrosoftController;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\TaskController;
@@ -59,6 +60,14 @@ Route::middleware('auth')->group(function () {
         ->name('groups.members.store');
     Route::delete('/groups/{group}/members/{user}', [GroupMemberController::class, 'destroy'])->name('groups.members.destroy');
     Route::delete('/groups/{group}/leave', [GroupMemberController::class, 'leave'])->name('groups.leave');
+
+    // Group tasks
+    Route::post('/groups/{group}/tasks', [GroupTaskController::class, 'store'])->name('groups.tasks.store');
+    Route::put('/groups/{group}/tasks/{task}', [GroupTaskController::class, 'update'])->name('groups.tasks.update');
+    Route::delete('/groups/{group}/tasks/{task}', [GroupTaskController::class, 'destroy'])->name('groups.tasks.destroy');
+    Route::patch('/groups/{group}/tasks/{task}/progress', [GroupTaskController::class, 'progress'])->name('groups.tasks.progress');
+    Route::patch('/groups/{group}/tasks/{task}/updates/{update}/approve', [GroupTaskController::class, 'approve'])->name('groups.tasks.approve');
+    Route::patch('/groups/{group}/tasks/{task}/updates/{update}/reject', [GroupTaskController::class, 'reject'])->name('groups.tasks.reject');
 
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });

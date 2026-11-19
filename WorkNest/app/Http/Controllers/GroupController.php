@@ -14,7 +14,13 @@ class GroupController extends Controller
     public function index(Request $request): View
     {
         $groups = $request->user()->groups()
-            ->withCount(['members', 'tasks'])
+            ->withCount([
+                'members',
+                'tasks',
+                'tasks as done_tasks_count' => fn ($query) => $query->where('progress', '>=', 100),
+                'taskUpdates as pending_updates_count' => fn ($query) => $query->where('group_task_updates.status', 'pending'),
+            ])
+            ->withAvg('tasks', 'progress')
             ->with('owner')
             ->orderBy('groups.name')
             ->get();
@@ -53,7 +59,33 @@ class GroupController extends Controller
 
         $group->load(['owner', 'members']);
 
-        return view('groups.show', compact('group'));
+        // Soonest deadline first, tasks without a deadline last
+        $tasks = $group->tasks()
+            ->with(['assignee', 'latestUpdate'])
+            ->orderByRaw('deadline IS NULL')
+            ->orderBy('deadline')
+            ->orderBy('id')
+            ->get();
+
+        // Whole-group progress: the average of every task's APPROVED progress
+        $overall = $tasks->isNotEmpty() ? (int) round($tasks->avg('progress')) : 0;
+        $doneCount = $tasks->where('progress', '>=', 100)->count();
+
+        // How many updates are waiting for the leader
+        $pendingCount = $tasks->filter(fn ($task) => $task->latestUpdate?->status === 'pending')->count();
+
+        // Per-member progress, based on the tasks assigned to each person
+        $memberStats = $group->members->mapWithKeys(function ($member) use ($tasks) {
+            $mine = $tasks->where('assigned_to', $member->id);
+
+            return [$member->id => [
+                'total' => $mine->count(),
+                'done' => $mine->where('progress', '>=', 100)->count(),
+                'avg' => $mine->isNotEmpty() ? (int) round($mine->avg('progress')) : 0,
+            ]];
+        });
+
+        return view('groups.show', compact('group', 'tasks', 'overall', 'doneCount', 'pendingCount', 'memberStats'));
     }
 
     // Delete the whole group (owner only)

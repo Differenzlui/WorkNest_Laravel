@@ -55,7 +55,7 @@
                     <p>No tasks match "{{ $search }}".</p>
                     <a href="{{ route('tasks.by-date', $date) }}" class="mt-2 inline-block underline">Clear search</a>
                 @else
-                    <p>No tasks are due on this day.</p>
+                    <p>No personal tasks are due on this day.</p>
                 @endif
             </div>
         @else
@@ -128,6 +128,9 @@
             </ul>
         @endif
     </div>
+
+    {{-- Group tasks assigned to me on this day --}}
+    @include('groups._assigned-list', ['groupTasks' => $groupTasks, 'heading' => 'Group tasks due on this day'])
 
     {{-- Edit popup --}}
     <dialog id="edit-modal"

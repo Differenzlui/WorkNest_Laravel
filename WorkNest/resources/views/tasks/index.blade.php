@@ -82,6 +82,9 @@
         @endif
     </div>
 
+    {{-- Group tasks assigned to me --}}
+    @include('groups._assigned-list', ['groupTasks' => $groupTasks, 'heading' => 'Assigned to me in groups'])
+
     {{-- New Task popup --}}
     <dialog id="task-modal"
             class="m-auto w-full max-w-md rounded-3xl bg-cream p-8 text-bark backdrop:bg-black/50">

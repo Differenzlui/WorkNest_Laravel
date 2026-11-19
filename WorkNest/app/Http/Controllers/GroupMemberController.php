@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\GroupTaskUpdate;
 use App\Models\Group;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
@@ -73,10 +74,16 @@ class GroupMemberController extends Controller
         return redirect()->route('groups.index')->with('status', 'You left the group.');
     }
 
-    // Take someone out of the group. Their tasks stay, but become "unassigned".
+        // Take someone out of the group. Their tasks stay, but become "unassigned".
     private function removeFromGroup(Group $group, User $user): void
     {
         DB::transaction(function () use ($group, $user) {
+            // Their waiting progress updates no longer apply
+            GroupTaskUpdate::where('user_id', $user->id)
+                ->where('status', 'pending')
+                ->whereHas('task', fn ($query) => $query->where('group_id', $group->id))
+                ->delete();
+
             $group->tasks()->where('assigned_to', $user->id)->update(['assigned_to' => null]);
             $group->members()->detach($user->id);
         });

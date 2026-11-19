@@ -29,8 +29,17 @@
                         @foreach ($week as $day)
                             @php
                                 $key = $day->toDateString();
-                                $dayTasks = $tasks->get($key, collect());
                                 $inMonth = $day->month === $current->month;
+
+                                // Mix my own tasks and my group tasks, unfinished ones first
+                                $items = $tasks->get($key, collect())
+                                    ->map(fn ($t) => ['kind' => 'personal', 'task' => $t, 'done' => (bool) $t->is_done])
+                                    ->concat(
+                                        $groupTasks->get($key, collect())
+                                            ->map(fn ($t) => ['kind' => 'group', 'task' => $t, 'done' => $t->progress >= 100])
+                                    )
+                                    ->sortBy(fn ($item) => $item['done'] ? 1 : 0)
+                                    ->values();
                             @endphp
 
                             <a href="{{ url('/tasks/date/' . $key) }}"
@@ -40,19 +49,31 @@
                                     {{ $day->day }}
                                 </span>
 
-                                @foreach ($dayTasks->take(2) as $task)
-                                    <p class="mt-1 truncate rounded bg-bark px-1.5 py-0.5 text-xs text-cream {{ $task->is_done ? 'line-through opacity-60' : '' }}">
-                                        {{ $task->name }}
+                                @foreach ($items->take(2) as $item)
+                                    <p class="mt-1 truncate rounded px-1.5 py-0.5 text-xs
+                                              {{ $item['kind'] === 'group' ? 'bg-leaf text-bark ring-1 ring-bark/30' : 'bg-bark text-cream' }}
+                                              {{ $item['done'] ? 'line-through opacity-60' : '' }}">
+                                        {{ $item['task']->name }}
                                     </p>
                                 @endforeach
 
-                                @if ($dayTasks->count() > 2)
-                                    <p class="mt-1 text-xs font-bold">+{{ $dayTasks->count() - 2 }} more</p>
+                                @if ($items->count() > 2)
+                                    <p class="mt-1 text-xs font-bold">+{{ $items->count() - 2 }} more</p>
                                 @endif
                             </a>
                         @endforeach
                     @endforeach
 
+                </div>
+
+                {{-- Legend --}}
+                <div class="mt-4 flex flex-wrap items-center gap-x-6 gap-y-1 text-xs">
+                    <span class="flex items-center gap-2">
+                        <span class="inline-block h-3 w-6 rounded bg-bark"></span> My tasks
+                    </span>
+                    <span class="flex items-center gap-2">
+                        <span class="inline-block h-3 w-6 rounded bg-leaf ring-1 ring-bark/30"></span> Group tasks assigned to me
+                    </span>
                 </div>
             </div>
         </div>

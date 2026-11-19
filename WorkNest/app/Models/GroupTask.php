@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class GroupTask extends Model
 {
@@ -42,5 +44,17 @@ class GroupTask extends Model
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    // Every progress report ever sent for this task
+    public function updates(): HasMany
+    {
+        return $this->hasMany(GroupTaskUpdate::class);
+    }
+
+    // Only the newest report (waiting, approved or rejected)
+    public function latestUpdate(): HasOne
+    {
+        return $this->hasOne(GroupTaskUpdate::class)->latestOfMany();
     }
 }

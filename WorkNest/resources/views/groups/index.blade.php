@@ -35,7 +35,14 @@
                         <h2 class="truncate text-lg font-bold">{{ $group->name }}</h2>
 
                         @if ($group->owner_id === auth()->id())
-                            <span class="shrink-0 rounded-full bg-leaf px-2 py-0.5 text-xs font-bold">Owner</span>
+                            <div class="flex shrink-0 items-center gap-1">
+                                @if ($group->pending_updates_count > 0)
+                                    <span class="rounded-full bg-amber-200 px-2 py-0.5 text-xs font-bold text-amber-900">
+                                        {{ $group->pending_updates_count }} to review
+                                    </span>
+                                @endif
+                                <span class="rounded-full bg-leaf px-2 py-0.5 text-xs font-bold">Owner</span>
+                            </div>
                         @endif
                     </div>
 
@@ -48,6 +55,12 @@
                         &middot;
                         {{ $group->tasks_count }} {{ $group->tasks_count === 1 ? 'task' : 'tasks' }}
                     </p>
+                    @if ($group->tasks_count > 0)
+                        <div class="mt-3">
+                            <p class="mb-1 text-xs opacity-80">{{ $group->done_tasks_count }} of {{ $group->tasks_count }} done</p>
+                            <x-progress-bar :value="$group->tasks_avg_progress ?? 0" />
+                        </div>
+                    @endif
                 </a>
             @endforeach
         </div>

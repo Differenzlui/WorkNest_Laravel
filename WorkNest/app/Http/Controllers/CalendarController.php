@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\GroupTask;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
@@ -25,7 +26,7 @@ class CalendarController extends Controller
         // Cut the days into rows of 7
         $weeks = array_chunk(CarbonPeriod::create($start, $end)->toArray(), 7);
 
-        // Get this user's tasks inside the grid and group them by date
+        // My own tasks inside the grid, grouped by date
         $tasks = $request->user()->tasks()
             ->whereDate('deadline', '>=', $start->toDateString())
             ->whereDate('deadline', '<=', $end->toDateString())
@@ -33,6 +34,16 @@ class CalendarController extends Controller
             ->get()
             ->groupBy(fn ($task) => $task->deadline->toDateString());
 
-        return view('calendar', compact('current', 'weeks', 'tasks'));
+        // Group tasks assigned to me inside the grid, grouped by date
+        $groupTasks = GroupTask::query()
+            ->where('assigned_to', $request->user()->id)
+            ->whereNotNull('deadline')
+            ->whereDate('deadline', '>=', $start->toDateString())
+            ->whereDate('deadline', '<=', $end->toDateString())
+            ->orderByRaw('progress >= 100')
+            ->get()
+            ->groupBy(fn ($task) => $task->deadline->toDateString());
+
+        return view('calendar', compact('current', 'weeks', 'tasks', 'groupTasks'));
     }
 }
